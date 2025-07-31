@@ -1,7 +1,6 @@
  stages:
   - deploy
 
-
  Application Deployment Production:
 
     stage: deploy
@@ -9,12 +8,15 @@
       GIT_DEPTH: 1
       GIT_STRATEGY: clone
     script:
-     - docker login https://registry.nutanix.com:5000 -u admin -p nutanix/4u
+     - export SHORT_SHA=$(echo $CI_COMMIT_SHORT_SHA)
+     - export IMAGE_TAG="v1.0.0-$SHORT_SHA"
+     - docker login https://10.38.13.140:5000 -u nutanix -p nx2Tech806!
      - docker login -u ariefpri1122 -p nutanix/4u
      - cp Dockerfile.$CI_COMMIT_BRANCH Dockerfile
      - docker build -t arief_laravel_$CI_COMMIT_BRANCH .
-     - docker tag arief_laravel_$CI_COMMIT_BRANCH registry.nutanix.com:5000/arief_laravel_$CI_COMMIT_BRANCH
-     - docker push registry.nutanix.com:5000/arief_laravel_$CI_COMMIT_BRANCH
+     - docker tag arief_laravel_$CI_COMMIT_BRANCH 10.38.13.140:5000/library/arief_laravel_$CI_COMMIT_BRANCH:$IMAGE_TAG
+     - docker push 10.38.13.140:5000/library/arief_laravel_$CI_COMMIT_BRANCH:$IMAGE_TAG
+     
     only:
       refs:
         - development
@@ -23,5 +25,4 @@
       variables:
         - $CI_COMMIT_MESSAGE =~ /nyalip/
     tags:
-      - vm_runner
-
+      - vm-runner
